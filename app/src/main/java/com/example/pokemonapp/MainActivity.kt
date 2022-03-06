@@ -30,19 +30,20 @@ class MainActivity : ComponentActivity() {
             PokemonAppTheme {
                 val controller = rememberNavController()
 
-                NavHost(navController = controller, startDestination = "pokemon_list_screen"){
-                    composable(route = "pokemon_list_screen"){
+                NavHost(navController = controller, startDestination = "pokemon_list_screen") {
+                    composable(route = "pokemon_list_screen") {
                         PokemonListScreen(navController = controller)
                     }
-                    composable(route = "pokemon_details_screen/{dominantColor}/{pokemonName}", arguments = listOf(
-                        navArgument(name = "dominantColor"){
-                            type = NavType.IntType
-                        },
-                        navArgument(name = "pokemonName"){
-                            type = NavType.StringType
-                        }
-                    )){
-                        val dominantColor = remember{
+                    composable(route = "pokemon_details_screen/{dominantColor}/{pokemonName}",
+                        arguments = listOf(
+                            navArgument(name = "dominantColor") {
+                                type = NavType.IntType
+                            },
+                            navArgument(name = "pokemonName") {
+                                type = NavType.StringType
+                            }
+                        )) {
+                        val dominantColor = remember {
                             val color = it.arguments?.getInt("dominantColor")
                             color?.let { Color(it) } ?: Color.White
                         }

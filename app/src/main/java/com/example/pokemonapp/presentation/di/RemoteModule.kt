@@ -1,4 +1,4 @@
-package com.example.pokemonapp.di
+package com.example.pokemonapp.presentation.di
 
 import com.example.pokemonapp.data.api.PokemonApi
 import com.example.pokemonapp.data.repository.datasource.PokemonRemoteDataSource

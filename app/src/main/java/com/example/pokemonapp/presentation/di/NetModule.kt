@@ -1,4 +1,4 @@
-package com.example.pokemonapp.di
+package com.example.pokemonapp.presentation.di
 
 import com.example.pokemonapp.BuildConfig
 import com.example.pokemonapp.data.api.PokemonApi
@@ -10,7 +10,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module

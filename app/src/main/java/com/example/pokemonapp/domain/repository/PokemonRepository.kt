@@ -5,6 +5,6 @@ import com.example.pokemonapp.data.model.single_pokemon.Pokemon
 import com.example.pokemonapp.data.util.Resource
 
 interface PokemonRepository {
-    suspend fun getPokemonList() : Resource<PokemonList>
-    suspend fun getPokemonDetails() : Resource<Pokemon>
+    suspend fun getPokemonList(offset : Int, limit : Int) : Resource<PokemonList>
+    suspend fun getPokemonDetails(name : String) : Resource<Pokemon>
 }

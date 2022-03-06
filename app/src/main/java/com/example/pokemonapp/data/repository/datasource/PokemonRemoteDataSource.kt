@@ -6,7 +6,7 @@ import retrofit2.Response
 
 interface PokemonRemoteDataSource {
 
-    suspend fun getPokemonList() : Response<PokemonList>
-    suspend fun getPokemonDetails() : Response<Pokemon>
+    suspend fun getPokemonList(offset : Int, limit : Int) : Response<PokemonList>
+    suspend fun getPokemonDetails(name : String) : Response<Pokemon>
 
 }

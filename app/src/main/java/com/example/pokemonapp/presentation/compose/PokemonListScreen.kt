@@ -101,12 +101,12 @@ fun PokemonList(
             CircularProgressIndicator(color = MaterialTheme.colors.primary)
         }
         if (currentState is Resource.Error) {
-            Retry(error = currentState.message.toString()) {
+            Retry(currentState.message.toString()) {
                 listViewModel.loadPokemonPaginated()
             }
         }
-
     }
+
 }
 
 @Composable
@@ -114,8 +114,10 @@ fun Retry(
     error: String,
     onRetry: () -> Unit
 ) {
-    Column {
-        Text(text = error, fontSize = 18.sp, color = Color.Red)
+    Column(
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = error, fontSize = 24.sp, color = Color.Red, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { onRetry() },
@@ -175,7 +177,7 @@ fun PokemonEntry(
                     }
                 },
                 loading = {
-                    CircularProgressIndicator(color = MaterialTheme.colors.primary)
+                    CircularProgressIndicator(color = MaterialTheme.colors.primary, modifier = Modifier.scale(0.5f))
                 }
             )
             Text(

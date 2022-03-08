@@ -17,25 +17,56 @@ import com.example.pokemonapp.data.model.PokemonEntryList
 import com.example.pokemonapp.data.util.Const.PAGE_SIZE
 import com.example.pokemonapp.data.util.Resource
 import com.example.pokemonapp.domain.usecase.GetPokemonListUseCase
-import com.example.pokemonapp.domain.usecase.GetPokemonUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class PokemonListViewModel @Inject constructor(
     private val app: Application,
     private val getPokemonListUseCase: GetPokemonListUseCase,
-    private val getPokemonUseCase: GetPokemonUseCase
 ) : AndroidViewModel(app) {
 
     private var currentPage = 0
     var pokemonList = mutableStateOf<List<PokemonEntryList>>(listOf())
     var currentState = mutableStateOf<Resource<Any>>(Resource.Loading())
     var endReached = mutableStateOf(false)
+    var isSearching = mutableStateOf(false)
+    private var searchStart = true
+    private var cachedPokemonList = listOf<PokemonEntryList>()
 
     init {
         loadPokemonPaginated()
+    }
+
+    fun searchPokemon(query : String){
+        val listToSearch = if (searchStart){
+            pokemonList.value
+        }else{
+            cachedPokemonList
+        }
+
+        viewModelScope.launch {
+            if (query.isEmpty()){
+                pokemonList.value = cachedPokemonList
+                isSearching.value = false
+                searchStart = true
+                return@launch
+            }
+
+            val result = listToSearch.filter {
+                it.name.contains(query.trim(), ignoreCase = true) || it.number.toString() == query.trim()
+            }
+
+            if (searchStart){
+                cachedPokemonList = pokemonList.value
+                searchStart = false
+            }
+
+            pokemonList.value = result
+            isSearching.value = true
+        }
     }
 
     fun loadPokemonPaginated() = viewModelScope.launch {
@@ -55,7 +86,11 @@ class PokemonListViewModel @Inject constructor(
                             val url =
                                 "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png"
 
-                            PokemonEntryList(result.name!!.uppercase(), number.toInt(), url)
+                            PokemonEntryList(result.name!!.replaceFirstChar {
+                                if (it.isLowerCase()) it.titlecase(
+                                    Locale.getDefault()
+                                ) else it.toString()
+                            }, number.toInt(), url)
                         }
                         currentPage++
                         currentState.value = Resource.Success("Success")

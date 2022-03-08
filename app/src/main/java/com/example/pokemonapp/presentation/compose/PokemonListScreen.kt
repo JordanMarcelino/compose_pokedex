@@ -27,9 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.pokemonapp.R
 import com.example.pokemonapp.data.model.PokemonEntryList
@@ -39,7 +37,8 @@ import com.example.pokemonapp.ui.theme.RobotoCondensed
 
 @Composable
 fun PokemonListScreen(
-    navController: NavController
+    navController: NavController,
+    listViewModel: PokemonListViewModel = hiltViewModel()
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -61,10 +60,9 @@ fun PokemonListScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 onSearch = {
-
+                    listViewModel.searchPokemon(it)
                 }
             )
-            Spacer(modifier = Modifier.height(16.dp))
             PokemonList(navController = navController)
         }
     }
@@ -78,6 +76,7 @@ fun PokemonList(
     val pokemonList by remember { listViewModel.pokemonList }
     val currentState by remember { listViewModel.currentState }
     val endReached by remember { listViewModel.endReached }
+    val isSearching by remember { listViewModel.isSearching }
 
     LazyColumn(contentPadding = PaddingValues(16.dp)) {
         val itemCount = if (pokemonList.size % 2 == 0) {
@@ -86,8 +85,10 @@ fun PokemonList(
             pokemonList.size / 2 + 1
         }
         items(count = itemCount) {
-            if (it >= itemCount - 1 && !endReached && (currentState !is Resource.Loading)) {
-                listViewModel.loadPokemonPaginated()
+            if (it >= itemCount - 1 && !endReached && (currentState !is Resource.Loading) && !isSearching) {
+                LaunchedEffect(key1 = true) {
+                    listViewModel.loadPokemonPaginated()
+                }
             }
             PokemonRow(entries = pokemonList, navController = navController, rowIndex = it)
         }
@@ -172,12 +173,15 @@ fun PokemonEntry(
                     .size(120.dp)
                     .align(CenterHorizontally),
                 onSuccess = {
-                    listViewModel.calcDominateColor(it.result.drawable){ color ->
+                    listViewModel.calcDominateColor(it.result.drawable) { color ->
                         dominantColor = color
                     }
                 },
                 loading = {
-                    CircularProgressIndicator(color = MaterialTheme.colors.primary, modifier = Modifier.scale(0.5f))
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colors.primary,
+                        modifier = Modifier.scale(0.5f)
+                    )
                 }
             )
             Text(

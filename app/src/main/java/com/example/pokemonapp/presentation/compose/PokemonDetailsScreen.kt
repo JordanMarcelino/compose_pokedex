@@ -38,7 +38,7 @@ import com.example.pokemonapp.data.model.single_pokemon.Type
 import com.example.pokemonapp.data.util.PokemonParse
 import com.example.pokemonapp.data.util.Resource
 import com.example.pokemonapp.presentation.viewmodel.PokemonDetailsViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 
 @Composable
@@ -53,83 +53,82 @@ fun PokemonDetailsScreen(
         value = detailsViewModel.getPokemonDetail(pokemonName)
     }
 
-    val scope = rememberCoroutineScope()
-
-    if (pokemon.value is Resource.Success) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(dominantColor)
-        ) {
-            TopSection(navController = navController)
-            DetailsPokemon(
-                pokemon = pokemon.value,
-                pokemonName = pokemonName,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = 20.dp + (200.dp / 2f),
-                        bottom = 16.dp,
-                        end = 16.dp,
-                        start = 16.dp
-                    )
-                    .shadow(10.dp, RoundedCornerShape(20.dp))
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colors.surface)
-                    .padding(16.dp)
-                    .align(Alignment.BottomCenter),
-                loadingModifier = Modifier
-                    .size(100.dp)
-                    .align(Alignment.Center)
-                    .padding(
-                        top = 20.dp + 200.dp / 2f,
-                        bottom = 16.dp,
-                        end = 16.dp,
-                        start = 16.dp
-                    )
-            )
+    when (pokemon.value) {
+        is Resource.Success -> {
             Box(
-                contentAlignment = Alignment.TopCenter,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .background(dominantColor)
             ) {
-                PokemonImage(
+                TopSection(navController = navController)
+                DetailsPokemon(
                     pokemon = pokemon.value,
-                    pokemonName = pokemonName
+                    pokemonName = pokemonName,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = 20.dp + (200.dp / 2f),
+                            bottom = 16.dp,
+                            end = 16.dp,
+                            start = 16.dp
+                        )
+                        .shadow(10.dp, RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colors.surface)
+                        .padding(16.dp)
+                        .align(Alignment.BottomCenter),
+                    loadingModifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.Center)
+                        .padding(
+                            top = 20.dp + 200.dp / 2f,
+                            bottom = 16.dp,
+                            end = 16.dp,
+                            start = 16.dp
+                        )
                 )
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp)
+                ) {
+                    PokemonImage(
+                        pokemon = pokemon.value,
+                        pokemonName = pokemonName
+                    )
+                }
             }
         }
-    } else if (pokemon.value is Resource.Loading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(dominantColor)
-        ) {
-            TopSection(navController = navController)
+        is Resource.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(dominantColor)
             ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colors.primary,
-                )
+                TopSection(navController = navController)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colors.primary,
+                    )
+                }
             }
         }
-    } else if (pokemon.value is Resource.Error) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(dominantColor)
-        ) {
-            TopSection(navController = navController)
+        is Resource.Error -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(dominantColor)
             ) {
-                Retry(error = pokemon.value.message!!) {
-                    scope.launch {
-                        detailsViewModel.getPokemonDetail(pokemonName)
+                TopSection(navController = navController)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Retry(error = pokemon.value.message!!) {
                     }
                 }
             }

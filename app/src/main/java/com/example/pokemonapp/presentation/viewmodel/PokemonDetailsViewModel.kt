@@ -19,7 +19,7 @@ class PokemonDetailsViewModel @Inject constructor(
 ) : AndroidViewModel(app) {
 
 
-    suspend fun getPokemonDetail(name: String): Resource<Pokemon> {
+     suspend fun getPokemonDetail(name: String) : Resource<Pokemon> {
         return try {
             if (isNetworkAvailable()) {
                 getPokemonUseCase.execute(name.lowercase())
